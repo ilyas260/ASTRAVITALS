@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -50,5 +50,115 @@
 <script src="assets/js/scene.js"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/login.js"></script>
+
+<!-- NASA Branding & Right-Side Hero Visual -->
+<style>
+  #nasa-hero-showcase {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  #nasa-hero-showcase .nasa-earth-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.65;
+    mix-blend-mode: lighten;
+    -webkit-mask-image: radial-gradient(circle at 60% 50%, rgba(0,0,0,1) 35%, rgba(0,0,0,0) 78%);
+    mask-image: radial-gradient(circle at 60% 50%, rgba(0,0,0,1) 35%, rgba(0,0,0,0) 78%);
+  }
+  #nasa-hero-showcase .nasa-emblem-wrap {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 28px 36px;
+    border-radius: 24px;
+    background: radial-gradient(circle, rgba(7, 11, 20, 0.55) 0%, rgba(7, 11, 20, 0.15) 100%);
+    backdrop-filter: blur(4px);
+  }
+  #nasa-hero-showcase .nasa-emblem-large {
+    width: 220px;
+    max-width: 30vw;
+    height: auto;
+    filter: drop-shadow(0 0 28px rgba(11, 61, 145, 0.75));
+  }
+  #nasa-hero-showcase .nasa-mission-tag {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.78);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  }
+  @media (max-width: 960px) {
+    #nasa-hero-showcase { display: none; }
+  }
+</style>
+
+<div id="nasa-hero-showcase" aria-hidden="true">
+  <img class="nasa-earth-bg" src="https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg" alt="Earth from Orbit">
+  <div class="nasa-emblem-wrap">
+    <img class="nasa-emblem-large" src="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg" alt="NASA Insignia">
+    <span class="nasa-mission-tag">NASA &middot; Autonomous Crew Health Telemetry</span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue && node.nodeValue.indexOf('Crew Health Console') !== -1) {
+        var el = node.parentElement;
+        while (el && el.parentElement && el.parentElement !== document.body) {
+          var st = window.getComputedStyle(el.parentElement);
+          if (st.display === 'flex' && st.flexDirection !== 'column') {
+            var brandRow = el.parentElement;
+            var textBlock = el;
+            if (!document.getElementById('nasa-top-logo')) {
+              Array.from(brandRow.children).forEach(function(child) {
+                if (child !== textBlock) {
+                  child.style.display = 'none';
+                }
+              });
+              var img = document.createElement('img');
+              img.id = 'nasa-top-logo';
+              img.src = 'https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg';
+              img.alt = 'NASA Logo';
+              img.style.cssText = 'height:46px;width:auto;margin-right:14px;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(11,61,145,0.5));';
+
+              var sep = document.createElement('span');
+              sep.style.cssText = 'width:1px;height:28px;background:rgba(255,255,255,0.2);margin-right:14px;display:inline-block;flex-shrink:0;';
+
+              brandRow.insertBefore(sep, textBlock);
+              brandRow.insertBefore(img, sep);
+            }
+            break;
+          }
+          el = el.parentElement;
+        }
+        break;
+      }
+    }
+  })();
+</script>
+
 </body>
 </html>
+
