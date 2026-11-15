@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crew | Crew Health Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --color-space: #0B0F19; --color-primary: #1E3A8A; --color-slate: #1E293B; --color-accent: #38BDF8;
+    --color-mute: #94A3B8; --color-alert: #EF4444; --color-good: #10B981; --color-risk: #F59E0B;
+    --font-display: "Outfit", system-ui, sans-serif; --font-sans: "Instrument Sans", system-ui, sans-serif;
+  }
+</style>
+<link rel="stylesheet" href="assets/css/icons.css">
+<link rel="stylesheet" href="assets/css/console.css">
+<style> [class*='ask-ai'], [id*='ask-ai'] { display: none !important; } </style>
+<style id="astravitals-card-fix">
+  /* Garder la courbe strictement à l'intérieur du cadre (carreau) */
+  #view section, #view article, #view [class*="inst"], #view [class*="card"] {
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  #view [class*="inst"] > div, #view [class*="card"] > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  #view [class*="inst"] svg, #view [class*="card"] svg {
+    max-width: 95px !important;
+    flex-shrink: 0 !important;
+  }
+  /* Masquer tout bouton ou lien Ask AI restant */
+  [data-route="ask-ai"] {
+    display: none !important;
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+
+<!-- Crew console: the signed-in crew member's own record -->
+<div id="app">
+  <aside class="rail">
+    <div class="brand"><div class="patch" aria-hidden="true"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg" alt="NASA" style="width:100%; height:100%; object-fit:contain;"></div><div><b>Crew Health</b><span class="cap">Station Meridian</span></div></div>
+    <nav class="nav" id="nav" aria-label="Sections"><div class="nav-slider" id="navSlider"></div></nav>
+    <div class="rail-foot">
+      <button class="nav-btn" data-route="account" title="Account and devices"><i class="ic ic-user"></i><span class="t">Account &amp; devices</span></button>
+      <button class="nav-btn" data-action="logout" title="Log out"><i class="ic ic-logout"></i><span class="t">Log out</span></button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="mr-auto min-w-0">
+        <h1 id="pageTitle">Overview</h1>
+        <div class="greet" id="greet"></div>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <button class="btn" data-action="openEntry"><svg class="s" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Log metric</button>
+        <div class="relative">
+          <button class="icon-btn" data-action="toggleNotes" aria-label="Notifications" aria-haspopup="true"><i class="ic ic-bell"></i><span class="count" id="noteCount" hidden></span></button>
+          <div class="glass pop" id="notes" hidden></div>
+        </div>
+        <button class="icon-btn" data-route="account" aria-label="Account"><i class="ic ic-user"></i></button>
+      </div>
+    </header>
+    <main class="canvas" id="canvas">
+      <div id="banner"></div>
+      <div id="view"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Manual metric entry -->
+<div class="overlay" id="entry" hidden>
+  <form class="glass modal" id="entryForm" novalidate aria-labelledby="entryTitle" role="dialog" aria-modal="true">
+    <span class="cap">Manual entry</span>
+    <h2 id="entryTitle">Log a metric</h2>
+    <p class="mute text-sm" style="margin:6px 0 20px" id="entryFor"></p>
+    <div class="grid grid-cols-2 gap-4">
+      <label class="field col-span-2">Metric
+        <select class="input" id="eMetric"></select>
+      </label>
+      <label class="field col-span-2" id="eNameWrap" hidden>Custom metric name
+        <input class="input" id="eName" placeholder="e.g. Blood glucose">
+      </label>
+      <label class="field"><span id="eValLab">Value</span>
+        <input class="input" id="eVal" type="number" step="any" inputmode="decimal">
+      </label>
+      <label class="field" id="eVal2Wrap" hidden>Diastolic
+        <input class="input" id="eVal2" type="number" step="any" inputmode="decimal">
+      </label>
+      <label class="field" id="eUnitWrap">Unit
+        <input class="input" id="eUnit" placeholder="e.g. mg/dL">
+      </label>
+      <label class="field col-span-2">Date and time
+        <input class="input" id="eTime" type="datetime-local">
+      </label>
+      <label class="field col-span-2">Notes
+        <textarea class="input" id="eNotes" rows="3" placeholder="Context for this reading (optional)"></textarea>
+      </label>
+    </div>
+    <div class="err" id="entryErr" role="alert" style="margin-top:10px"></div>
+    <div class="flex justify-end gap-2" style="margin-top:6px">
+      <button type="button" class="btn ghost" data-action="closeEntry">Cancel</button>
+      <button type="submit" class="btn primary">Save record</button>
+    </div>
+  </form>
+</div>
+<div id="toastHost"></div>
+
+<script src="assets/js/scene.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/user.js"></script>
+
+<script src="assets/js/chatbot.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('*').forEach(el => { if(el.textContent.trim() === 'Ask AI') { let parent = el.closest('li') || el.closest('a') || el; parent.style.display = 'none'; } }); });</script>
+</body>
+</html>

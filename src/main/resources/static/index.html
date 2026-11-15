@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in | Crew Health Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --color-space: #0B0F19; --color-primary: #1E3A8A; --color-slate: #1E293B; --color-accent: #38BDF8;
+    --color-mute: #94A3B8; --color-alert: #EF4444; --color-good: #10B981; --color-risk: #F59E0B;
+    --font-display: "Outfit", system-ui, sans-serif; --font-sans: "Instrument Sans", system-ui, sans-serif;
+  }
+</style>
+<link rel="stylesheet" href="assets/css/icons.css">
+<link rel="stylesheet" href="assets/css/console.css">
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+
+<!-- Login: the account decides which interface opens (crew -> user.html, administrator -> admin.html) -->
+<main class="login">
+  <header><div class="patch" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" fill="#0f1c45" stroke="#38BDF8" stroke-width="1"/><circle cx="24" cy="24" r="19.5" stroke="rgba(255,255,255,.25)" stroke-width=".6" stroke-dasharray="1 2.2"/><path d="M30.5 13.2a12 12 0 1 0 4.3 16.6 9.4 9.4 0 0 1-4.3-16.6z" fill="#e5edf9"/><ellipse cx="24" cy="24" rx="20" ry="6.2" stroke="#38BDF8" stroke-width="1.2" transform="rotate(-24 24 24)"/><circle cx="41.2" cy="15.6" r="2" fill="#fff"/><path d="M12 12.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z" fill="#fff"/></svg></div><div><b>Crew Health Console</b><div class="cap">Station Meridian</div></div></header>
+  <div class="stage">
+    <span class="cap">Expedition 12, lunar orbit</span>
+    <h1>Crew health,<br>watched from <b>orbit</b></h1>
+    <p class="lede">Heart, bone, sleep and radiation readings for every crew member, with the next action spelled out when something drifts.</p>
+    <form id="loginForm" novalidate>
+      <label class="field">Registration number
+        <input class="input" id="reg" autocomplete="username" placeholder="REG-0000001" value="REG-0000001">
+      </label>
+      <label class="field">Password
+        <input class="input" id="pw" type="password" autocomplete="current-password" placeholder="Password" value="demo-pass">
+      </label>
+      <div class="err" id="loginErr" role="alert"></div>
+      <button class="btn primary" type="submit">Access console</button>
+    </form>
+    <div style="margin-top:22px">
+      <span class="cap">Demo accounts, simulated data, any password</span>
+      <div class="acct">
+        <button class="btn sm ghost" type="button" data-fill="REG-0000001">Crew: REG-0000001</button>
+        <button class="btn sm ghost" type="button" data-fill="REG-0000003">Crew: REG-0000003</button>
+        <button class="btn sm ghost" type="button" data-fill="ADM-0000001">Admin: ADM-0000001</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="assets/js/scene.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/login.js"></script>
+</body>
+</html>
